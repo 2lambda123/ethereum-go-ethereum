@@ -5,6 +5,8 @@ image:
   - Ubuntu
   - Visual Studio 2019
 
+#stack: go 1.18.5
+
 environment:
   matrix:
     - GETH_ARCH: amd64
@@ -13,8 +15,12 @@ environment:
       GETH_MINGW: 'C:\msys64\mingw32'
 
 install:
-  - git submodule update --init --depth 1 --recursive
-  - go version
+  - gvm list
+  - ls /usr/local/g*
+  - /usr/local/go/bin/go version
+#  - git submodule update --init --depth 1 --recursive
+#  - gvm install go1.18.5
+#  - go version
 
 for:
   # Linux has its own script without -arch and -cc.
@@ -22,7 +28,13 @@ for:
   - matrix:
       only:
         - image: Ubuntu
+    environment:
+      GOPATH: /usr/go/
     build_script:
+      - echo $PATH
+      - gvm list
+      - ls -l /usr/go
+      - go version
       - go run build/ci.go lint
       - go run build/ci.go generate -verify
       - go run build/ci.go install -dlgo
@@ -46,6 +58,7 @@ for:
       GETH_CC: '%GETH_MINGW%\bin\gcc.exe'
       PATH: '%GETH_MINGW%\bin;C:\Program Files (x86)\NSIS\;%PATH%'
     build_script:
+      - go version
       - 'echo %GETH_ARCH%'
       - 'echo %GETH_CC%'
       - '%GETH_CC% --version'
